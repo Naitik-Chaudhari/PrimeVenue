@@ -22,6 +22,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .Property(e => e.Status)
             .HasDefaultValue("Pending");
 
+        modelBuilder.Entity<EventRequest>()
+            .Property(e => e.IsOrganized)
+            .HasDefaultValue(false);
+
+        modelBuilder.Entity<EventRequest>()
+            .Property(e => e.Rating)
+            .IsRequired(false);
+
         modelBuilder.Entity<EventTemplate>()
             .Property(e => e.Status)
             .HasDefaultValue("Draft");
@@ -37,7 +45,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.Entity<TemplateVendor>()
             .Property(tv => tv.Status)
             .HasDefaultValue("Pending");
-
 
         // Category - SubCategory
         modelBuilder.Entity<SubCategory>()
@@ -63,7 +70,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Organizer (User) - EventTemplate (1:N)
         modelBuilder.Entity<EventTemplate>()
             .HasOne(t => t.Organizer)
-            .WithMany() // Organizer doesn’t need back reference
+            .WithMany()
             .HasForeignKey(t => t.OrganizerId)
             .OnDelete(DeleteBehavior.Restrict);
 

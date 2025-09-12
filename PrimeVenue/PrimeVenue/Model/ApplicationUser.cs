@@ -11,7 +11,7 @@ namespace PrimeVenue.Model
         [Required]
         public string FullName { get; set; }
 
-        // Role info (though Identity uses AspNetRoles, you can still store a quick role here if needed)
+
         [DefaultValue("Customer")]
         public string Role { get; set; } = "Customer"; // Organizer, Vendor, Customer
 

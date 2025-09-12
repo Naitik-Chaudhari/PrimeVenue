@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,7 +13,7 @@ namespace PrimeVenue.Model
         [Required]
         public string CustomerId { get; set; }
 
-        [Required]// FK to ApplicationUser
+        [Required]
         public int SubCategoryId { get; set; }
 
         [Required(ErrorMessage = "Budget is Required")]
@@ -31,11 +31,20 @@ namespace PrimeVenue.Model
         [Required(ErrorMessage = "Event Time is Required"), DataType(DataType.Time)]
         public TimeSpan EventTime { get; set; }
 
+        [StringLength(300)]
+        public string RequestedServices { get; set; }
+
         [StringLength(500)]
         public string AdditionalNotes { get; set; }
 
         [DefaultValue("Pending")]
         public string Status { get; set; } = "Pending"; // Pending, TemplateSent, Confirmed, Cancelled
+
+        [DefaultValue(false)]
+        public bool IsOrganized { get; set; } = false;
+
+        [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
+        public int? Rating { get; set; }
 
         // Navigation
         public ApplicationUser Customer { get; set; }

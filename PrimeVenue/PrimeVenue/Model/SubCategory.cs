@@ -12,6 +12,8 @@ namespace PrimeVenue.Model
         [Required]
         public string Name { get; set; }
 
+        public string ImageUrl { get; set; }
+
         [Required]
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
