@@ -1,0 +1,45 @@
+﻿@model PrimeVenue.Model.EventRequest
+
+<h2>Request Event</h2>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="CustomerId" />
+    <input type="hidden" asp-for="SubCategoryId" />
+
+    <div>
+        <label asp-for="Budget"></label>
+        <input asp-for="Budget" />
+    </div>
+
+    <div>
+        <label asp-for="VenuePreference"></label>
+        <input asp-for="VenuePreference" />
+    </div>
+
+    <div>
+        <label asp-for="GuestCapacity"></label>
+        <input asp-for="GuestCapacity" />
+    </div>
+
+    <div>
+        <label asp-for="EventDate"></label>
+        <input asp-for="EventDate" type="date" />
+    </div>
+
+    <div>
+        <label asp-for="EventTime"></label>
+        <input asp-for="EventTime" type="time" />
+    </div>
+
+    <div>
+        <label asp-for="RequestedServices"></label>
+        <input asp-for="RequestedServices" />
+    </div>
+
+    <div>
+        <label asp-for="AdditionalNotes"></label>
+        <textarea asp-for="AdditionalNotes"></textarea>
+    </div>
+
+    <button type="submit">Submit Request</button>
+</form>
