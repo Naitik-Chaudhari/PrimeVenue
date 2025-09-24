@@ -1,0 +1,35 @@
+﻿@model PrimeVenue.Model.VendorService
+
+@{
+    ViewData["Title"] = "Add Vendor Service";
+}
+
+<h2>Add Vendor Service</h2>
+
+<form asp-action="AddVendor" method="post">
+    <div class="form-group">
+        <label asp-for="VendorId">Select Vendor:</label>
+        <select asp-for="VendorId" class="form-control" asp-items="@(new SelectList(ViewBag.Users, "Id", "FullName"))">
+            <option value="">-- Select User --</option>
+        </select>
+        <span asp-validation-for="VendorId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ServiceType">Service Type:</label>
+        <input asp-for="ServiceType" class="form-control" placeholder="Catering, Venue, Decoration..." />
+        <span asp-validation-for="ServiceType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PriceEstimate">Price Estimate:</label>
+        <input asp-for="PriceEstimate" class="form-control" type="number" step="0.01" />
+        <span asp-validation-for="PriceEstimate" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Add Vendor Service</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

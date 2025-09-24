@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace PrimeVenue.Model
@@ -14,6 +15,7 @@ namespace PrimeVenue.Model
         public string ImageUrl { get; set; }
 
         // Navigation
+        [ValidateNever]
         public ICollection<SubCategory> SubCategories { get; set; }
     }
 }

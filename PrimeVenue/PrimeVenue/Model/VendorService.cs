@@ -15,12 +15,13 @@ namespace PrimeVenue.Model
         [Required]
         public string ServiceType { get; set; } // Catering, Venue, Decoration
 
-        [Range(1000, 1000000)]
+        [Range(1000, 1000000, ErrorMessage = "Price must be between 1000 and 1,000,000.")]
         [Column(TypeName = "decimal(18,2)")]
+        [Required]
         public decimal PriceEstimate { get; set; }
 
         [Range(1, 5)]
-        public double Rating { get; set; }
+        public double? Rating { get; set; }
 
         // Navigation
         public ApplicationUser Vendor { get; set; }

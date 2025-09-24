@@ -46,5 +46,33 @@ namespace PrimeVenue.Model
                 }
             }
         }
+
+        public static async Task AssignVendorRoleAsync(IServiceProvider serviceProvider, string userId)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            // Ensure the "Vendor" role exists
+            if (!await roleManager.RoleExistsAsync("Vendor"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Vendor"));
+            }
+
+            // Find the user by Id
+            var user = await userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                // Remove existing roles (optional, if you want single role per user)
+                var currentRoles = await userManager.GetRolesAsync(user);
+                await userManager.RemoveFromRolesAsync(user, currentRoles);
+
+                // Assign Vendor role
+                await userManager.AddToRoleAsync(user, "Vendor");
+
+                // Update the user's Role property if you are using it
+                user.Role = "Vendor";
+                await userManager.UpdateAsync(user);
+            }
+        }
     }
 }

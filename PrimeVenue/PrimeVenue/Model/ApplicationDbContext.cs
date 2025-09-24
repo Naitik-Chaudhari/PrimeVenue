@@ -36,11 +36,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         modelBuilder.Entity<VendorService>()
             .Property(v => v.PriceEstimate)
-            .HasDefaultValue(0);
+            .HasDefaultValue(1000);
 
         modelBuilder.Entity<VendorService>()
             .Property(v => v.Rating)
-            .HasDefaultValue(0);
+            .HasDefaultValue(1.0);
 
         modelBuilder.Entity<TemplateVendor>()
             .Property(tv => tv.Status)

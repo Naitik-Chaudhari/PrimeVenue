@@ -2,12 +2,20 @@
 
 <h2>Select a Category</h2>
 
-<ul>
+<ul style="list-style-type:none; padding:0;">
     @foreach (var category in Model)
     {
-        <li>
-            <a asp-controller="Category" asp-action="SubCategories" asp-route-categoryId="@category.Id">
-                @category.Name
+        <li style="margin: 10px 0;">
+            <a asp-controller="Category"
+               asp-action="SubCategories"
+               asp-route-categoryId="@category.Id"
+               style="display: flex; align-items: center; text-decoration: none;">
+
+                <img src="@category.ImageUrl" alt="@category.Name" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 10px;" />
+
+                <span style="font-size: 18px; font-weight: bold; color: #333;">
+                    @category.Name
+                </span>
             </a>
         </li>
     }
