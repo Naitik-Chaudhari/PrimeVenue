@@ -27,9 +27,12 @@ namespace PrimeVenue.Controllers
         // Organizer Dashboard home
         public IActionResult Index()
         {
-            ViewBag.Message = "Welcome to Organizer Dashboard!";
-            Debug.WriteLine("OrganizerDashboard Index loaded");
-            return View();
+            // Show pending event requests to organizer
+            var pending = _context.EventRequests
+                                  .Where(r => r.Status == "Pending")
+                                  .OrderByDescending(r => r.EventDate)
+                                  .ToList();
+            return View(pending);
         }
 
         // GET: AddVendor form

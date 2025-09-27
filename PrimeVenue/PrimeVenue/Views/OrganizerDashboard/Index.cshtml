@@ -1,5 +1,33 @@
-﻿@{
-    ViewData["Title"] = "Home";
+﻿@model IEnumerable<PrimeVenue.Model.EventRequest>
+
+@{
+    ViewData["Title"] = "Organizer - Pending Requests";
 }
 
-<h1>Welcome to Organizer Dashboard.</h1>
+<h2>Pending Event Requests</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Event Date</th>
+            <th>Time</th>
+            <th>Budget</th>
+            <th>Services</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.CustomerId</td>
+                <td>@r.EventDate.ToShortDateString()</td>
+                <td>@r.EventTime</td>
+                <td>@r.Budget</td>
+                <td>@r.RequestedServices</td>
+                <td>@r.Status</td>
+            </tr>
+        }
+    </tbody>
+}</table>

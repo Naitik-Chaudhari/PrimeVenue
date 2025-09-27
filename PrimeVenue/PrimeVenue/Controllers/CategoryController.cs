@@ -58,8 +58,6 @@ namespace PrimeVenue.Controllers
             var model = new SubCategory { CategoryId = categoryId, Name = string.Empty };
             return View(model);
         }
-
-        // ---------------- Create SubCategory (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateSubCategory(SubCategory subCategory)

@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -46,9 +46,12 @@ namespace PrimeVenue.Model
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int? Rating { get; set; }
 
-        // Navigation
+        // Navigation (ignored in form validation)
+        [ValidateNever]
         public ApplicationUser Customer { get; set; }
+        [ValidateNever]
         public SubCategory SubCategory { get; set; }
+        [ValidateNever]
         public ICollection<EventTemplate> Templates { get; set; }
     }
 }

@@ -3,6 +3,8 @@
 <h2>Request Event</h2>
 
 <form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="CustomerId" />
     <input type="hidden" asp-for="SubCategoryId" />
 
@@ -41,5 +43,5 @@
         <textarea asp-for="AdditionalNotes"></textarea>
     </div>
 
-    <button type="submit">Submit Request</button>
+    <button type="submit" class="btn btn-primary mt-2">Submit Request</button>
 </form>
