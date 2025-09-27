@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-﻿
-=======
-﻿@model PrimeVenue.Model.SubCategory
+@model PrimeVenue.Model.SubCategory
 
 <h2>Create SubCategory</h2>
 
@@ -36,21 +33,11 @@
 </form>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
     <script>
-        // Live image preview
-        const input = document.getElementById("imageUrl");
-        const preview = document.getElementById("previewImage");
-
-        input.addEventListener("input", () => {
-            if (input.value) {
-                preview.src = input.value;
-                preview.style.display = "block";
-            } else {
-                preview.style.display = "none";
-            }
+        document.getElementById("imageUrl").addEventListener("input", function () {
+            let img = document.getElementById("previewImage");
+            img.src = this.value;
+            img.style.display = this.value ? "block" : "none";
         });
     </script>
 }
->>>>>>> 8bb57046f109f047f3ad315d824b1cccf706119b

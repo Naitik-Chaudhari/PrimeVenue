@@ -24,13 +24,38 @@ namespace PrimeVenue.Controllers
             _serviceProvider = serviceProvider;
         }
 
-        // Organizer Dashboard home
         public IActionResult Index()
         {
             ViewBag.Message = "Welcome to Organizer Dashboard!";
             Debug.WriteLine("OrganizerDashboard Index loaded");
+
+            //  Add a sample EventRequest for testing if none exist
+            if (!_context.EventRequests.Any())
+            {
+                var testRequest = new EventRequest
+                {
+                    CustomerId = _context.Users.FirstOrDefault()?.Id, // pick first user
+                    SubCategoryId = _context.SubCategories.FirstOrDefault()?.Id ?? 1, // fallback to 1
+                    Budget = 50000,
+                    VenuePreference = "Test Venue",
+                    GuestCapacity = 100,
+                    EventDate = DateTime.Today.AddDays(7),
+                    EventTime = new TimeSpan(18, 0, 0),
+                    RequestedServices = "Decoration, Catering",
+                    AdditionalNotes = "This is a test event request",
+                    Status = "Pending",
+                    IsOrganized = false
+                };
+
+                _context.EventRequests.Add(testRequest);
+                _context.SaveChanges();
+
+                Debug.WriteLine(" Test EventRequest inserted into database.");
+            }
+
             return View();
         }
+
 
         // GET: AddVendor form
         [HttpGet]
