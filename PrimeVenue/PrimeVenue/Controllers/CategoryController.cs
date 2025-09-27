@@ -52,6 +52,8 @@ namespace PrimeVenue.Controllers
             return View(subCategories); // <-- This must point to SubCategories.cshtml
         }
 
+<<<<<<< HEAD
+=======
 
         public IActionResult CreateSubCategory(int categoryId)
         {
@@ -73,5 +75,6 @@ namespace PrimeVenue.Controllers
             ViewBag.CategoryId = subCategory.CategoryId;
             return View(subCategory);
         }
+>>>>>>> 8bb57046f109f047f3ad315d824b1cccf706119b
     }
 }

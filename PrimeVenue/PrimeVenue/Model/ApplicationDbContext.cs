@@ -67,6 +67,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(t => t.EventRequestId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<EventRequest>()
+            .HasOne(r => r.FinalizedTemplate)
+            .WithMany()
+            .HasForeignKey(r => r.FinalizedTemplateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+
         // Organizer (User) - EventTemplate (1:N)
         modelBuilder.Entity<EventTemplate>()
             .HasOne(t => t.Organizer)

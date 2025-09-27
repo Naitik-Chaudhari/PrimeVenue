@@ -21,6 +21,8 @@ namespace PrimeVenue.Model
         [DefaultValue("Pending")]
         public string Status { get; set; } = "Pending"; // Pending, Confirmed, Declined
 
+        public DateTime? ResponseDate { get; set; }
+
         // Navigation
         public EventTemplate EventTemplate { get; set; }
         public VendorService VendorService { get; set; }
