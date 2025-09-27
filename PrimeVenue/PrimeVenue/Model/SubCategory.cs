@@ -10,15 +10,15 @@ namespace PrimeVenue.Model
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         [Required]
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
 
-        // Navigation
-        public Category Category { get; set; }
+        // Navigation (not required on form post)
+        public Category? Category { get; set; }
     }
 }

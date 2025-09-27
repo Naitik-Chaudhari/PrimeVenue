@@ -42,17 +42,21 @@ namespace PrimeVenue.Controllers
         }
 
         // Show subcategories for a category
+        // Show subcategories for a category
         public IActionResult SubCategories(int categoryId)
         {
             var subCategories = _categoryRepo.GetSubCategoriesByCategory(categoryId);
+            var category = _categoryRepo.GetById(categoryId); // optional, for name display
             ViewBag.CategoryId = categoryId;
-            return View(subCategories);
+            ViewBag.CategoryName = category?.Name; // optional
+            return View(subCategories); // <-- This must point to SubCategories.cshtml
         }
+
 
         public IActionResult CreateSubCategory(int categoryId)
         {
-            ViewBag.CategoryId = categoryId;
-            return View();
+            var model = new SubCategory { CategoryId = categoryId, Name = string.Empty };
+            return View(model);
         }
 
         // ---------------- Create SubCategory (POST)
@@ -60,6 +64,9 @@ namespace PrimeVenue.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateSubCategory(SubCategory subCategory)
         {
+            // Prevent validation error for navigation property 'Category' (not posted from form)
+            ModelState.Remove(nameof(SubCategory.Category));
+
             if (ModelState.IsValid)
             {
                 _categoryRepo.AddSubCategory(subCategory);

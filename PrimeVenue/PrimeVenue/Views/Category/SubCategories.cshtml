@@ -1,23 +1,20 @@
 ﻿@model IEnumerable<PrimeVenue.Model.SubCategory>
-@{
-    ViewBag.Title = "Select SubCategory";
-    var categoryId = ViewBag.CategoryId;
-}
 
-<h2>Select a SubCategory</h2>
+<h2>Subcategories</h2>
 
-<ul>
+<ul style="list-style-type:none; padding:0;">
     @foreach (var sub in Model)
     {
-        <li>
-            @sub.Name
-            <!-- "Request for Event" button -->
-            <a asp-controller="EventRequest" asp-action="Create" asp-route-subCategoryId="@sub.Id">
-                Request for Event
-            </a>
+        <li style="margin:10px 0; display:flex; align-items:center;">
+            <img src="@sub.ImageUrl" alt="@sub.Name"
+                 style="width:60px; height:60px; object-fit:cover; border-radius:6px; margin-right:10px;" />
+            <span style="font-size:16px; font-weight:bold;">@sub.Name</span>
         </li>
     }
 </ul>
 
-<!-- Optional Back Button to Categories -->
-<a asp-controller="Category" asp-action="Index">Back to Categories</a>
+<a asp-action="CreateSubCategory"
+   asp-route-categoryId="@ViewBag.CategoryId"
+   class="btn btn-success">
+    Add New SubCategory
+</a>
