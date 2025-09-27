@@ -1,1 +1,56 @@
+<<<<<<< HEAD
 ﻿
+=======
+﻿@model PrimeVenue.Model.SubCategory
+
+<h2>Create SubCategory</h2>
+
+<form asp-action="CreateSubCategory" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <!-- Hidden field for CategoryId -->
+    <input type="hidden" asp-for="CategoryId" />
+
+    <!-- SubCategory Name -->
+    <div>
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <!-- Image URL -->
+    <div>
+        <label asp-for="ImageUrl">Image URL</label>
+        <input asp-for="ImageUrl" id="imageUrl" class="form-control" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+    </div>
+
+    <!-- Image Preview -->
+    <div style="margin-top:10px;">
+        <img id="previewImage" src="" width="150" style="display:none;" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="margin-top:10px;">Create SubCategory</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Live image preview
+        const input = document.getElementById("imageUrl");
+        const preview = document.getElementById("previewImage");
+
+        input.addEventListener("input", () => {
+            if (input.value) {
+                preview.src = input.value;
+                preview.style.display = "block";
+            } else {
+                preview.style.display = "none";
+            }
+        });
+    </script>
+}
+>>>>>>> 8bb57046f109f047f3ad315d824b1cccf706119b

@@ -5,17 +5,21 @@
 <ul style="list-style-type:none; padding:0;">
     @foreach (var category in Model)
     {
-        <li style="margin: 10px 0;">
+        <li style="margin: 10px 0; display:flex; align-items:center;">
+
+            <img src="@category.ImageUrl" alt="@category.Name"
+                 style="width:80px; height:80px; object-fit:cover; border-radius:8px; margin-right:10px;" />
+
+            <span style="font-size:18px; font-weight:bold; color:#333; margin-right:10px;">
+                @category.Name
+            </span>
+
+            <!-- This is the important part -->
             <a asp-controller="Category"
                asp-action="SubCategories"
                asp-route-categoryId="@category.Id"
-               style="display: flex; align-items: center; text-decoration: none;">
-
-                <img src="@category.ImageUrl" alt="@category.Name" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 10px;" />
-
-                <span style="font-size: 18px; font-weight: bold; color: #333;">
-                    @category.Name
-                </span>
+               class="btn btn-primary">
+                View Subcategories
             </a>
         </li>
     }

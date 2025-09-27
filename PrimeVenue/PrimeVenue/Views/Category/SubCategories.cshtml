@@ -1,1 +1,24 @@
+<<<<<<< HEAD
 ﻿
+=======
+﻿@model IEnumerable<PrimeVenue.Model.SubCategory>
+
+<h2>Subcategories</h2>
+
+<ul style="list-style-type:none; padding:0;">
+    @foreach (var sub in Model)
+    {
+        <li style="margin:10px 0; display:flex; align-items:center;">
+            <img src="@sub.ImageUrl" alt="@sub.Name"
+                 style="width:60px; height:60px; object-fit:cover; border-radius:6px; margin-right:10px;" />
+            <span style="font-size:16px; font-weight:bold;">@sub.Name</span>
+        </li>
+    }
+</ul>
+
+<a asp-action="CreateSubCategory"
+   asp-route-categoryId="@ViewBag.CategoryId"
+   class="btn btn-success">
+    Add New SubCategory
+</a>
+>>>>>>> 8bb57046f109f047f3ad315d824b1cccf706119b
