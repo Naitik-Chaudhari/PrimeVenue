@@ -46,6 +46,9 @@ namespace PrimeVenue.Model
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int? Rating { get; set; }
 
+        public int? FinalizedTemplateId { get; set; }  // null until user finalizes one
+        public EventTemplate FinalizedTemplate { get; set; }
+
         // Navigation
         public ApplicationUser Customer { get; set; }
         public SubCategory SubCategory { get; set; }

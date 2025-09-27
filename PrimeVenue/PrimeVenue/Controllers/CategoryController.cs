@@ -49,24 +49,5 @@ namespace PrimeVenue.Controllers
             return View(subCategories);
         }
 
-        public IActionResult CreateSubCategory(int categoryId)
-        {
-            ViewBag.CategoryId = categoryId;
-            return View();
-        }
-
-        // ---------------- Create SubCategory (POST)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CreateSubCategory(SubCategory subCategory)
-        {
-            if (ModelState.IsValid)
-            {
-                _categoryRepo.AddSubCategory(subCategory);
-                return RedirectToAction("SubCategories", new { categoryId = subCategory.CategoryId });
-            }
-            ViewBag.CategoryId = subCategory.CategoryId;
-            return View(subCategory);
-        }
     }
 }

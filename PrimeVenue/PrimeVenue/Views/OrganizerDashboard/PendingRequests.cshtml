@@ -1,0 +1,29 @@
+﻿@model IEnumerable<PrimeVenue.Model.EventRequest>
+
+<h2>Pending Event Requests</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Budget</th>
+            <th>Event Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var req in Model)
+        {
+            <tr>
+                <td>@req.Customer.UserName</td>
+                <td>@req.Budget</td>
+                <td>@req.EventDate.ToShortDateString()</td>
+                <td>
+                    <a asp-action="CreateTemplate" asp-route-id="@req.Id" class="btn btn-primary">
+                        Create Template
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
