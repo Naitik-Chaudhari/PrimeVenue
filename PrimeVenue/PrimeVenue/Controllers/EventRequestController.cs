@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PrimeVenue.Model;
 using PrimeVenue.Repository;
 
@@ -7,10 +9,13 @@ namespace PrimeVenue.Controllers
     public class EventRequestController : Controller
     {
         private readonly IEventRequestRepository _eventRequestRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public EventRequestController(IEventRequestRepository eventRequestRepo)
+        public EventRequestController(IEventRequestRepository eventRequestRepo,
+                                      UserManager<ApplicationUser> userManager)
         {
             _eventRequestRepo = eventRequestRepo;
+            _userManager = userManager;
         }
 
         // ---------------- List All Requests (Organizer/Admin)
@@ -21,6 +26,7 @@ namespace PrimeVenue.Controllers
         }
 
         // ---------------- View Requests for a Customer
+        [Authorize(Roles = "Customer")]
         public IActionResult MyRequests(string customerId)
         {
             if (string.IsNullOrEmpty(customerId))
@@ -41,13 +47,18 @@ namespace PrimeVenue.Controllers
         }
 
         // ---------------- Create Event Request (GET)
+        [Authorize(Roles = "Customer")]
         public IActionResult Create(int subCategoryId)
         {
             // Pre-fill SubCategoryId
+            if (subCategoryId <= 0) return BadRequest("Invalid subCategoryId");
+
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId)) return Challenge();
             var request = new EventRequest
             {
                 SubCategoryId = subCategoryId,
-                CustomerId = User.Identity.Name // or from your ApplicationUser Id
+                CustomerId = userId
             };
 
             return View(request);
@@ -56,12 +67,28 @@ namespace PrimeVenue.Controllers
         // ---------------- Create Event Request (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Customer")]
         public IActionResult Create(EventRequest request)
         {
+            // Ensure CustomerId comes from the logged-in user, not the form
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId)) return Challenge();
+            request.CustomerId = userId;
+
+            // Remove navigation properties from validation
+            ModelState.Remove(nameof(EventRequest.Customer));
+            ModelState.Remove(nameof(EventRequest.SubCategory));
+            ModelState.Remove(nameof(EventRequest.Templates));
+
+            // Ensure defaults
+            request.Status = "Pending";
+            request.IsOrganized = false;
+
             if (ModelState.IsValid)
             {
                 _eventRequestRepo.Add(request);
-                return RedirectToAction("MyRequests", new { customerId = request.CustomerId });
+                // After creation, show customer's list (status Pending by default)
+                return RedirectToAction("Index", "CustomerDashboard");
             }
             return View(request);
         }
