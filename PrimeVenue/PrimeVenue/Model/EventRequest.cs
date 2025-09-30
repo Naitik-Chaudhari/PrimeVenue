@@ -38,7 +38,7 @@ namespace PrimeVenue.Model
         public string AdditionalNotes { get; set; }
 
         [DefaultValue("Pending")]
-        public string Status { get; set; } = "Pending"; // Pending, TemplateSent, Confirmed, Cancelled
+        public string Status { get; set; } = "Pending"; // Pending, TemplateSent, FinalizedTemplate, Confirmed, Cancelled
 
         [DefaultValue(false)]
         public bool IsOrganized { get; set; } = false;
@@ -46,15 +46,11 @@ namespace PrimeVenue.Model
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int? Rating { get; set; }
 
-<<<<<<< HEAD
-        // Navigation (ignored in form validation)
         [ValidateNever]
-=======
         public int? FinalizedTemplateId { get; set; }  // null until user finalizes one
-        public EventTemplate FinalizedTemplate { get; set; }
 
-        // Navigation
->>>>>>> 3fe11a56f7cac732bca4d82cdd0b97b7f331a557
+        [ValidateNever]
+        public EventTemplate FinalizedTemplate { get; set; }
         public ApplicationUser Customer { get; set; }
         [ValidateNever]
         public SubCategory SubCategory { get; set; }

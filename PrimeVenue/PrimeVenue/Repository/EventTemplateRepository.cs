@@ -27,6 +27,7 @@ namespace PrimeVenue.Repository
                            .Include(t => t.EventRequest)
                            .Include(t => t.TemplateVendors)
                            .ThenInclude(tv => tv.VendorService)
+                           .ThenInclude(v => v.Vendor)
                            .FirstOrDefault(t => t.Id == id);
         }
 

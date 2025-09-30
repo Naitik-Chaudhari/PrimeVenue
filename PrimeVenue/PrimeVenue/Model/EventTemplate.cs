@@ -22,7 +22,7 @@ namespace PrimeVenue.Model
         public decimal EstimatedBudget { get; set; }
 
         [DefaultValue("Draft")]
-        public string Status { get; set; } = "Draft"; // Draft, SentToCustomer, AcceptedByCustomer, Finalized
+        public string Status { get; set; } = "Draft"; // Draft, Confirmed, SentToCustomer, Finalized
 
         // Navigation
         public EventRequest EventRequest { get; set; }

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<PrimeVenue.Model.VendorService>
+
+@{
+    ViewData["Title"] = "Edit Vendors";
+    var template = ViewBag.Template;
+    var selectedIds = ViewBag.SelectedVendorIds as List<int>;
+}
+
+<h2>Edit Vendors for Template #@template.Id</h2>
+
+<form asp-action="EditVendorsForTemplate" method="post">
+    <input type="hidden" name="templateId" value="@template.Id" />
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Service Type</th>
+                <th>Vendor</th>
+                <th>Price Estimate</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vendor in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selectedVendorIds" value="@vendor.Id"
+                               @(selectedIds.Contains(vendor.Id) ? "checked" : "") />
+                    </td>
+                    <td>@vendor.ServiceType</td>
+                    <td>@vendor.Vendor.UserName</td>
+                    <td>@vendor.PriceEstimate</td>
+                    <td>@vendor.Rating</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="ReviewTemplate" asp-route-templateId="@template.Id" class="btn btn-secondary">
+        Cancel
+    </a>
+</form>

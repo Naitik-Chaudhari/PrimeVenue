@@ -1,4 +1,5 @@
-﻿using PrimeVenue.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using PrimeVenue.Model;
 
 namespace PrimeVenue.Repository
 {
@@ -14,7 +15,8 @@ namespace PrimeVenue.Repository
         public IEnumerable<EventRequest> GetAll()
         {
             return _context.EventRequests
-                           .OrderByDescending(r => r.EventDate)
+                           .OrderBy(r => r.EventDate)
+                           .Include(r => r.Customer)
                            .ToList();
         }
 

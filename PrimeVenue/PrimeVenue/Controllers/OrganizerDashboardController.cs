@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrimeVenue.Model;
+using PrimeVenue.Model.ViewModel;
 using PrimeVenue.Repository;
 using System.Diagnostics;
 
@@ -14,28 +15,59 @@ namespace PrimeVenue.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IServiceProvider _serviceProvider;
-
+        private readonly IEventRequestRepository _eventRequestRepo;
+        private readonly IEventTemplateRepository _eventTemplateRepo;
+        private readonly IVendorServiceRepository _vendorServiceRepo;
+        private readonly ITemplateVendorRepository _templateVendorRepo;
         public OrganizerDashboardController(ApplicationDbContext context,
                                             UserManager<ApplicationUser> userManager,
-                                            IServiceProvider serviceProvider)
+                                            IServiceProvider serviceProvider,
+                                            IEventRequestRepository eventRequestRepo,
+                                            IEventTemplateRepository eventTemplateRepo,
+                                            IVendorServiceRepository vendorServiceRepo,
+                                            ITemplateVendorRepository templateVendorRepo)
         {
             _context = context;
             _userManager = userManager;
             _serviceProvider = serviceProvider;
+            _eventRequestRepo = eventRequestRepo;
+            _eventTemplateRepo = eventTemplateRepo;
+            _vendorServiceRepo = vendorServiceRepo;
+            _templateVendorRepo = templateVendorRepo;
         }
 
         public IActionResult Index()
         {
-            // Show pending event requests to organizer
-            var pending = _context.EventRequests
-                                  .Where(r => r.Status == "Pending")
-                                  .OrderByDescending(r => r.EventDate)
-                                  .ToList();
-            return View(pending);
+            var model = new OrganizerDashboardViewModel
+            {
+                PendingRequests = _eventRequestRepo.GetAll()
+                                   .Where(r => r.Status == "Pending")
+                                   .ToList(),
+
+                TemplateSentRequests = _eventRequestRepo.GetAll()
+                                       .Where(r => r.Status == "TemplateSent")
+                                       .ToList(),
+
+                FinalizedTemplateRequests = _eventRequestRepo.GetAll()
+                                               .Where(r => r.Status == "FinalizedTemplate")
+                                               .ToList()
+            };
+
+            return View(model);
+        }
+
+        // Show templates for a given request
+        public IActionResult ViewTemplates(int eventRequestId)
+        {
+            var templates = _context.EventTemplates
+                .Where(t => t.EventRequestId == eventRequestId)
+                .ToList();
+
+            ViewBag.EventRequestId = eventRequestId;
+            return View(templates);
         }
 
 
-        // GET: AddVendor form
         [HttpGet]
         public async Task<IActionResult> AddVendor()
         {
@@ -88,17 +120,16 @@ namespace PrimeVenue.Controllers
 
         public IActionResult PendingRequests()
         {
-            var pendingRequests = _context.EventRequests
-                .Include(r => r.Customer)
-                .Where(r => r.IsOrganized == false)
-                .ToList();
+            var pendingRequests = _eventRequestRepo.GetAll()
+                                        .Where(r => r.Status == "Pending")
+                                        .ToList();
 
             return View(pendingRequests);
         }
 
         public IActionResult CreateTemplate(int id)
         {
-            var eventRequest = _context.EventRequests.Find(id);
+            var eventRequest = _eventRequestRepo.GetById(id);
             if (eventRequest == null) return NotFound();
 
             ViewBag.RequestId = id;
@@ -106,7 +137,7 @@ namespace PrimeVenue.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateTemplate(int eventRequestId, decimal estimatedBudget)
+        public IActionResult ConfirmCreateTemplate(int eventRequestId)
         {
             var organizerId = _userManager.GetUserId(User);
 
@@ -114,35 +145,22 @@ namespace PrimeVenue.Controllers
             {
                 EventRequestId = eventRequestId,
                 OrganizerId = organizerId,
-                EstimatedBudget = estimatedBudget,
                 Status = "Draft"
             };
 
-            _context.EventTemplates.Add(template);
+            _eventTemplateRepo.Add(template);
 
-            // Mark request as organized
-            var request = _context.EventRequests.Find(eventRequestId);
-            if (request != null)
-            {
-                request.IsOrganized = true;
-            }
-
-            _context.SaveChanges();
-
-            // Redirect to vendor selection for this template
             return RedirectToAction("AddVendorsToTemplate", new { templateId = template.Id });
         }
 
         public IActionResult AddVendorsToTemplate(int templateId)
         {
-            var template = _context.EventTemplates
-                .Include(t => t.EventRequest)
+            var template = _eventTemplateRepo.GetAll()
                 .FirstOrDefault(t => t.Id == templateId);
 
             if (template == null) return NotFound();
 
-            var vendorServices = _context.VendorServices
-                .Include(v => v.Vendor)
+            var vendorServices = _vendorServiceRepo.GetAll()
                 .OrderByDescending(v => v.Rating)
                 .ToList();
 
@@ -154,43 +172,110 @@ namespace PrimeVenue.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddVendorsToTemplate(int templateId, List<int> selectedVendorIds)
         {
-            var template = _context.EventTemplates.Find(templateId);
+            var template = _eventTemplateRepo.GetById(templateId);
             if (template == null) return NotFound();
 
             if (selectedVendorIds == null || !selectedVendorIds.Any())
             {
                 ModelState.AddModelError("", "Please select at least one vendor.");
-                var vendorServices = _context.VendorServices
-                    .Include(v => v.Vendor)
+                var vendorServices = _vendorServiceRepo.GetAll()
                     .OrderByDescending(v => v.Rating)
                     .ToList();
                 ViewBag.Template = template;
                 return View(vendorServices);
             }
 
-            foreach (var vendorId in selectedVendorIds)
+            var selectedVendors = _vendorServiceRepo.GetAll()
+                .Where(v => selectedVendorIds.Contains(v.Id))
+                .ToList();
+
+            decimal totalBudget = selectedVendors.Sum(v => v.PriceEstimate);
+
+            foreach (var vendor in selectedVendors)
             {
                 var tv = new TemplateVendor
                 {
                     EventTemplateId = templateId,
-                    VendorServiceId = vendorId,
+                    VendorServiceId = vendor.Id,
                     Status = "Pending"
                 };
-                _context.TemplateVendors.Add(tv);
+                _eventTemplateRepo.AddVendorToTemplate(tv);
             }
+
+            template.EstimatedBudget = totalBudget;
 
             _context.SaveChanges();
 
             return RedirectToAction("ReviewTemplate", new { templateId = templateId });
         }
 
+        public IActionResult EditVendorsForTemplate(int templateId)
+        {
+            var template = _eventTemplateRepo.GetAll()
+                .FirstOrDefault(t => t.Id == templateId);
+
+            if (template == null) return NotFound();
+
+            var selectedVendorIds = _eventTemplateRepo.GetById(templateId)
+                .TemplateVendors
+                .Select(tv => tv.VendorServiceId)
+                .ToList();
+
+            var vendorServices = _vendorServiceRepo.GetAll()
+                .OrderByDescending(v => v.Rating)
+                .ToList();
+
+            ViewBag.Template = template;
+            ViewBag.SelectedVendorIds = selectedVendorIds;
+
+            return View(vendorServices);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditVendorsForTemplate(int templateId, List<int> selectedVendorIds)
+        {
+            var template = _eventTemplateRepo.GetById(templateId);
+            if (template == null) return NotFound();
+
+            var existingVendorIds = _templateVendorRepo.GetByTemplate(templateId)
+                .Select(tv => tv.VendorServiceId)
+                .ToList();
+
+            var vendorsToAdd = selectedVendorIds.Except(existingVendorIds).ToList();
+            foreach (var vId in vendorsToAdd)
+            {
+                var TemplateVendor = new TemplateVendor
+                {
+                    EventTemplateId = templateId,
+                    VendorServiceId = vId,
+                    Status = "Pending"
+                };
+
+                _eventTemplateRepo.AddVendorToTemplate(TemplateVendor);
+            }
+
+            var vendorsToRemove = existingVendorIds.Except(selectedVendorIds).ToList();
+            var toRemoveEntities = _context.TemplateVendors
+                .Where(tv => tv.EventTemplateId == templateId && vendorsToRemove.Contains(tv.VendorServiceId));
+            _context.TemplateVendors.RemoveRange(toRemoveEntities);
+
+            var selectedVendors = _vendorServiceRepo.GetAll()
+                .Where(v => selectedVendorIds.Contains(v.Id))
+                .ToList();
+
+            template.EstimatedBudget = selectedVendors.Sum(v => v.PriceEstimate);
+
+            _context.SaveChanges();
+
+            return RedirectToAction("ReviewTemplate", new { templateId = templateId });
+        }
+
+
+
         public IActionResult ReviewTemplate(int templateId)
         {
-            var template = _context.EventTemplates
-                .Include(t => t.TemplateVendors)
-                .ThenInclude(tv => tv.VendorService)
-                .ThenInclude(v => v.Vendor)
-                .FirstOrDefault(t => t.Id == templateId);
+            var template = _eventTemplateRepo.GetById(templateId);
 
             if (template == null) return NotFound();
 
@@ -199,13 +284,30 @@ namespace PrimeVenue.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public IActionResult RemoveTemplate(int templateId, int eventRequestId)
+        {
+            var template = _eventTemplateRepo.GetById(templateId);
+            if (template == null) return NotFound();
+
+            var templateVendors = _context.TemplateVendors
+                .Where(tv => tv.EventTemplateId == templateId)
+                .ToList();
+
+            _context.TemplateVendors.RemoveRange(templateVendors);
+
+            // Remove template
+            _eventTemplateRepo.Delete(templateId);
+
+            TempData["SuccessMessage"] = "Template removed successfully!";
+            return RedirectToAction("ViewTemplates", new { eventRequestId = eventRequestId });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult ConfirmTemplate(int templateId)
         {
-            var template = _context.EventTemplates
-                .Include(t => t.EventRequest)
-                .Include(t => t.TemplateVendors)
-                .ThenInclude(tv => tv.VendorService)
-                .FirstOrDefault(t => t.Id == templateId);
+            var template = _eventTemplateRepo.GetById(templateId);
 
             if (template == null)
             {
@@ -214,15 +316,40 @@ namespace PrimeVenue.Controllers
             }
 
             template.Status = "Confirmed";
-            _context.EventTemplates.Update(template);
+            _eventTemplateRepo.Update(template);
 
             TempData["Success"] = $"Template #{template.Id} confirmed and sent to customer.";
-
-            _context.SaveChanges();
 
             // Redirect to dashboard
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendTemplatesToUser(int eventRequestId)
+        {
+            var eventRequest = _eventRequestRepo.GetById(eventRequestId);
+            if (eventRequest == null) return NotFound();
+
+            // Update request status
+            eventRequest.Status = "TemplateSent";
+
+            // Update all templates for this request
+            var templates = _eventTemplateRepo.GetAll()
+                .Where(t => t.EventRequestId == eventRequestId)
+                .ToList();
+
+            foreach (var template in templates)
+            {
+                template.Status = "SentToCustomer";
+            }
+
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Templates have been sent to the customer!";
+            return RedirectToAction("Index");
+        }
+
 
     }
 }

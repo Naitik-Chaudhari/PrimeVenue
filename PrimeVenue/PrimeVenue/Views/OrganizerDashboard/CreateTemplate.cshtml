@@ -4,11 +4,13 @@
 
 <h2>Create Template</h2>
 
-<form asp-action="CreateTemplate" method="post">
+<form asp-action="ConfirmCreateTemplate" method="post">
     <input type="hidden" name="eventRequestId" value="@ViewBag.RequestId" />
-    <div class="form-group">
-        <label>Estimated Budget</label>
-        <input type="number" step="0.01" name="estimatedBudget" class="form-control" required />
-    </div>
-    <button type="submit" class="btn btn-success">Save Template</button>
+
+    <p>
+        A new template will be created for this Event Request.
+        You can add vendors in the next step, and the Estimated Budget will be calculated automatically.
+    </p>
+
+    <button type="submit" class="btn btn-success">Create Template</button>
 </form>

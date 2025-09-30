@@ -60,12 +60,12 @@
 <div class="mt-3">
     <form asp-action="ConfirmTemplate" method="post">
         <input type="hidden" name="templateId" value="@Model.Id" />
-        <button type="submit" class="btn btn-success">Confirm & Send to Customer</button>
+        <button type="submit" class="btn btn-success">Confirm</button>
     </form>
 
-    <a asp-action="AddVendorsToTemplate" asp-route-templateId="@Model.Id" class="btn btn-warning mt-2">
+    <a asp-action="EditVendorsForTemplate" asp-route-templateId="@Model.Id" class="btn btn-warning mt-2">
         Edit Vendors
     </a>
 
-    <a asp-action="PendingRequests" class="btn btn-secondary mt-2">Back to Dashboard</a>
+    <a asp-action="Index" class="btn btn-secondary mt-2">Back to Dashboard</a>
 </div>
