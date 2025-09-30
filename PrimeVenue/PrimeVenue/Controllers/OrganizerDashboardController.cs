@@ -26,43 +26,12 @@ namespace PrimeVenue.Controllers
 
         public IActionResult Index()
         {
-<<<<<<< HEAD
-            ViewBag.Message = "Welcome to Organizer Dashboard!";
-            Debug.WriteLine("OrganizerDashboard Index loaded");
-
-            //  Add a sample EventRequest for testing if none exist
-            if (!_context.EventRequests.Any())
-            {
-                var testRequest = new EventRequest
-                {
-                    CustomerId = _context.Users.FirstOrDefault()?.Id, // pick first user
-                    SubCategoryId = _context.SubCategories.FirstOrDefault()?.Id ?? 1, // fallback to 1
-                    Budget = 50000,
-                    VenuePreference = "Test Venue",
-                    GuestCapacity = 100,
-                    EventDate = DateTime.Today.AddDays(7),
-                    EventTime = new TimeSpan(18, 0, 0),
-                    RequestedServices = "Decoration, Catering",
-                    AdditionalNotes = "This is a test event request",
-                    Status = "Pending",
-                    IsOrganized = false
-                };
-
-                _context.EventRequests.Add(testRequest);
-                _context.SaveChanges();
-
-                Debug.WriteLine(" Test EventRequest inserted into database.");
-            }
-
-            return View();
-=======
             // Show pending event requests to organizer
             var pending = _context.EventRequests
                                   .Where(r => r.Status == "Pending")
                                   .OrderByDescending(r => r.EventDate)
                                   .ToList();
             return View(pending);
->>>>>>> a88007fef8cb8e44953d08126adb205698512ccd
         }
 
 
